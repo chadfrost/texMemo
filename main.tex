@@ -1,13 +1,15 @@
 \documentclass[paper=letter]{texMemo}
+\usepackage{graphicx}
 
 \input{header.tex}
-
+\makeatletter
 \ifthenelse{\equal{\@memodraft}{\relax}}{}{%
     \RequirePackage{palatino}
     \usepackage{draftwatermark}
     \SetWatermarkText{DRAFT}
     \SetWatermarkLightness{.95}
 }
+\makeatother
 
 \begin{document}
 \maketitle
