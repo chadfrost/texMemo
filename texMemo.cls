@@ -49,6 +49,10 @@
 % Create the Letterhead and To/From Block
 \renewcommand{\maketitle}{\makememotitle}
 \newcommand\makememotitle{
+	{\begin{center}
+		\Large\bfseries
+		M\textsc{emorandum}
+	\end{center}}
 	% To, From, Subject Block
     \begin{minipage}[b][][b]{0.7\textwidth}
     	\begin{description}
