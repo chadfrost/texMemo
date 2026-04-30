@@ -37,6 +37,12 @@
 \def\@memologo{\relax}
 \newcommand{\memologo}[1]{\gdef\@memologo{\protect #1}}
 
+\def\@memoheader{\relax}
+\newcommand{\memoheader}[1]{\gdef\@memoheader{#1}}
+
+\def\@memofooter{\relax}
+\newcommand{\memofooter}[1]{\gdef\@memofooter{#1}}
+
 \def\@memodraft{\relax}
 \newcommand{\memodraft}[1]{\gdef\@memodraft{#1}}
 
@@ -72,7 +78,13 @@
     		\end{flushright}
     	}
 	\end{minipage}
- 	\decorativeline\bigskip{}
+ 	\decorativeline\vspace{2pt}\par
+	% Print the memo header text directly under the decorative rule on the title page
+	\ifthenelse{\equal{\@memoheader}{\relax}}{}{%
+		{\centering\@memoheader\par\vspace{2pt}}%
+	}
+	% ensure the title page doesn't show the top-of-page header (we print it manually)
+	\thispagestyle{plain}
 }
 
 % don't use indented paragraphs, instead use slight breaks
@@ -90,3 +102,29 @@
 % required if you're using LaTeX created by PanDoc
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+% Load fancy header/footer and include git version if available
+\RequirePackage{fancyhdr}
+\IfFileExists{gitversion.tex}{\input{gitversion.tex}}{\providecommand{\gitversion}{}}
+% Defer setting the page style until after \begin{document} to avoid KOMA
+% resetting it. Apply the fancyhdr configuration at begin document.
+\AtBeginDocument{%
+	\pagestyle{fancy}%
+	\fancyhf{}% clear header/footer
+	\renewcommand{\headrulewidth}{0pt}%
+	\renewcommand{\footrulewidth}{0pt}%
+	% header: use memoheader if provided
+	\ifthenelse{\equal{\@memoheader}{\relax}}{}{\fancyhead[C]{\@memoheader}}%
+	% footer: combine memofooter (if any) with gitversion
+	\ifthenelse{\equal{\@memofooter}{\relax}}{\fancyfoot[C]{\gitversion}}{\fancyfoot[C]{\@memofooter \\ \gitversion}}%
+	\fancyfoot[R]{\thepage}%
+}
+
+% Ensure the `plain` pagestyle (used by title/first page) matches `fancy`
+\fancypagestyle{plain}{%
+	\fancyhf{}%
+	\renewcommand{\headrulewidth}{0pt}%
+	\renewcommand{\footrulewidth}{0pt}%
+	% plain: no header (we print header manually under the rule on page one), keep footer
+	\ifthenelse{\equal{\@memofooter}{\relax}}{\fancyfoot[C]{\gitversion}}{\fancyfoot[C]{\@memofooter \\ \gitversion}}%
+	\fancyfoot[R]{\thepage}%
+}
